@@ -20,8 +20,8 @@ tasks.withType(JavaCompile).configureEach {
 
 repositories {
     exclusiveContent {
-        forRepository { maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven' } }
-        filter { includeGroup 'maven.modrinth' }
+        forRepository { maven { name = 'CurseMaven'; url = 'https://cursemaven.com' } }
+        filter { includeGroup 'curse.maven' }
     }
     exclusiveContent {
         forRepository { maven { name = 'BlameJared'; url = 'https://maven.blamejared.com' } }
@@ -57,7 +57,7 @@ neoForge {
 
 dependencies {
     // Scannable: the mod whose GUI we are extending. Compile-only — never bundled.
-    compileOnly "maven.modrinth:scannable:${scannable_version}"
+    compileOnly "curse.maven:scannable-reforged-${scannable_curseforge_project_id}:${scannable_curseforge_file_id}"
     // Scannable's own runtime dependency. On the compile classpath so javac can
     // resolve the signatures of Scannable classes that reference Architectury types.
     compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
@@ -79,7 +79,7 @@ dependencies {
 // system's "two modules export the same package" check).
 def runtimeModCoordinates = [
     "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}",
-    "maven.modrinth:scannable:${scannable_version}",
+    "curse.maven:scannable-reforged-${scannable_curseforge_project_id}:${scannable_curseforge_file_id}",
     "dev.architectury:architectury-neoforge:${architectury_version}",
 ]
 def runtimeModConfig = configurations.detachedConfiguration(

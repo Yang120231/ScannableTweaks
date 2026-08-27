@@ -53,7 +53,7 @@ jobs:
           java: 21
           environment: client | server
           curseforge-dependencies: |
-            scannable(required)
+            scannable-reforged(required)
             jei(required)
 
           fail-mode: fail

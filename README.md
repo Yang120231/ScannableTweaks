@@ -1,7 +1,7 @@
 <h1 align="center">Scannable Tweaks</h1>
 
 <p align="center">
-    An unofficial quality-of-life addon for Scannable with JEI drag-and-drop support.
+    An unofficial quality-of-life addon for Scannable Reforged with JEI drag-and-drop support.
 </p>
 
 <p align="center">
@@ -23,7 +23,7 @@
 
 - Minecraft 1.21.1
 - NeoForge 21.1.0 or newer
-- Scannable Reforged 1.1.2 or newer, or Scannable 1.8.0 or newer
+- [Scannable Reforged](https://www.curseforge.com/minecraft/mc-mods/scannable-reforged) 1.1.2 or newer
 - JEI 19 or newer
 
 ## Building
