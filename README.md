@@ -14,7 +14,7 @@
 
 ## Features
 
-Drag blocks from JEI into any of Scannable Reforged's five scanner slots while preserving empty slot positions.
+Changes the marking interaction to drag-and-drop.
 
 ## Requirements
 
