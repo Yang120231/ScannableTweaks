@@ -22,8 +22,8 @@
 ## Requirements
 
 - Minecraft 1.21.1
-- NeoForge 21.1.248 or newer
-- Scannable 1.7 or newer
+- NeoForge 21.1.0 or newer
+- Scannable Reforged 1.1.2 or newer, or Scannable 1.8.0 or newer
 - JEI 19 or newer
 
 ## Building
