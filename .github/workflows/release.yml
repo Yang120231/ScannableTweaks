@@ -42,7 +42,7 @@ jobs:
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
-          files: build/libs/scannable_tweaks-${{ steps.properties.outputs.version }}+mc1.21.1.jar
+          files: build/libs/scannable_tweaks-${{ steps.properties.outputs.version }}.jar
           name: Scannable Tweaks ${{ steps.properties.outputs.version }} for Minecraft 1.21.1
           version: ${{ steps.properties.outputs.version }}
           version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
