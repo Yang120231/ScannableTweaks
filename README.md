@@ -14,10 +14,7 @@
 
 ## Features
 
-- Drag block ingredients from JEI into any of Scannable's five block scanner slots.
-- Keep empty slots between configured blocks instead of packing every block to the left.
-- Ignore non-block ingredients automatically.
-- Store slot positions on the module while remaining compatible with Scannable's block list.
+Drag blocks from JEI into any of Scannable Reforged's five scanner slots while preserving empty slot positions.
 
 ## Requirements
 
