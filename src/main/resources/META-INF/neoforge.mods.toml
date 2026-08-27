@@ -1,0 +1,51 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "${mod_license}"
+issueTrackerURL = "${mod_issues}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+displayURL = "${mod_homepage}"
+description = '''
+${mod_description}
+'''
+# Everything degrades gracefully: a client with this mod can join a server without it and
+# simply gets Scannable's own packed-list behaviour back.
+displayTest = "IGNORE_SERVER_VERSION"
+
+[[mixins]]
+config = "scannable_tweaks.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1.248,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "1.21.1"
+ordering = "NONE"
+side = "BOTH"
+
+# Needed on both sides: the GUI is client-side, but the slot layout is stored on the item
+# and so has to be written by whichever side owns it.
+[[dependencies.${mod_id}]]
+modId = "scannable"
+type = "required"
+versionRange = "${scannable_version_range}"
+ordering = "AFTER"
+side = "BOTH"
+
+# The drag-and-drop half only exists on the client, and JEI is a client-only mod.
+[[dependencies.${mod_id}]]
+modId = "jei"
+type = "required"
+versionRange = "${jei_version_range}"
+ordering = "AFTER"
+side = "CLIENT"

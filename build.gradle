@@ -1,0 +1,131 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '1.0.17'
+}
+
+version = "${mod_version}+mc${minecraft_version}"
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+// The platform default encoding here is GBK, which javac would otherwise use to read
+// sources written as UTF-8.
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    exclusiveContent {
+        forRepository { maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven' } }
+        filter { includeGroup 'maven.modrinth' }
+    }
+    exclusiveContent {
+        forRepository { maven { name = 'BlameJared'; url = 'https://maven.blamejared.com' } }
+        filter { includeGroup 'mezz.jei' }
+    }
+    exclusiveContent {
+        forRepository { maven { name = 'Architectury'; url = 'https://maven.architectury.dev' } }
+        filter { includeGroupByRegex 'dev\\.architectury.*' }
+    }
+}
+
+neoForge {
+    version = neoforge_version
+
+    parchment {
+        minecraftVersion = parchment_minecraft_version
+        mappingsVersion = parchment_mappings_version
+    }
+
+    mods {
+        scannable_tweaks {
+            sourceSet sourceSets.main
+        }
+    }
+
+    runs {
+        client {
+            client()
+            gameDirectory = file('run')
+        }
+    }
+}
+
+dependencies {
+    // Scannable: the mod whose GUI we are extending. Compile-only — never bundled.
+    compileOnly "maven.modrinth:scannable:${scannable_version}"
+    // Scannable's own runtime dependency. On the compile classpath so javac can
+    // resolve the signatures of Scannable classes that reference Architectury types.
+    compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
+
+    // JEI: compile against the API artifacts only.
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+}
+
+// Populate run/mods/ with the runtime mod jars. moddev 1.0.x does NOT
+// auto-mirror additional classpath entries into the gameDir/mods folder, and
+// ModLauncher's mod discovery only reads from there — so without this task
+// the dev client sees Scannable Tweaks' required JEI/Scannable deps as [MISSING]
+// and rolls the whole mod state into "broken".
+//
+// We resolve directly from the named Maven coordinates rather than from a
+// configuration, so the jars are NOT added to the classpath (which would
+// collide with their own presence in run/mods/ and trip the Java module
+// system's "two modules export the same package" check).
+def runtimeModCoordinates = [
+    "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}",
+    "maven.modrinth:scannable:${scannable_version}",
+    "dev.architectury:architectury-neoforge:${architectury_version}",
+]
+def runtimeModConfig = configurations.detachedConfiguration(
+    runtimeModCoordinates.collect { project.dependencies.create(it) } as Dependency[]
+)
+runtimeModConfig.transitive = true
+
+tasks.register('copyModsToRunDir', Sync) {
+    from runtimeModConfig
+    into file('run/mods')
+    exclude '**/*-sources.jar'
+    doFirst { file('run/mods').mkdirs() }
+}
+
+tasks.named('runClient').configure {
+    dependsOn 'copyModsToRunDir'
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    def expansions = [
+            minecraft_version      : minecraft_version,
+            neoforge_version       : neoforge_version,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : project.version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+            mod_homepage           : mod_homepage,
+            mod_issues             : mod_issues,
+            scannable_version_range: scannable_version_range,
+            jei_version_range      : jei_version_range,
+    ]
+    inputs.properties(expansions)
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand expansions
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'   : mod_name,
+                'Specification-Version' : project.version,
+                'Implementation-Title'  : mod_name,
+                'Implementation-Version': project.version,
+        ])
+    }
+}
