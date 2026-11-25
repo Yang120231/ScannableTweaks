@@ -91,6 +91,7 @@ def runtimeModCoordinates = [
     "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}",
     "curse.maven:scannable-reforged-${scannable_curseforge_project_id}:${scannable_curseforge_file_id}",
     "dev.architectury:architectury-neoforge:${architectury_version}",
+    "dev.emi:emi-neoforge:${emi_version}",
 ]
 def runtimeModConfig = configurations.detachedConfiguration(
     runtimeModCoordinates.collect { project.dependencies.create(it) } as Dependency[]
