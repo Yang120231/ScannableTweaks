@@ -1,11 +1,21 @@
-name: Publish to CurseForge
+name: Release
 
 on:
   release:
-    types: [published]
+    types: [ published ]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to CurseForge / Modrinth (if tokens are configured)'
+        type: boolean
+        default: false
+      prerelease:
+        description: 'Mark manual release as beta'
+        type: boolean
+        default: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   publish:
@@ -14,6 +24,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Setup JDK 21
         uses: actions/setup-java@v4
@@ -29,33 +43,56 @@ jobs:
           chmod +x gradlew
           ./gradlew clean build --no-daemon --stacktrace
 
-      - name: Read project version
+      - name: Read project properties
         id: properties
         shell: bash
         run: |
-          version="$(sed -n 's/^mod_version=//p' gradle.properties)"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          mod_id="$(sed -n 's/^mod_id=//p' gradle.properties | tr -d '\r')"
+          mod_name="$(sed -n 's/^mod_name=//p' gradle.properties | tr -d '\r')"
+          mod_version="$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')"
+          echo "mod_id=$mod_id" >> "$GITHUB_OUTPUT"
+          echo "mod_name=$mod_name" >> "$GITHUB_OUTPUT"
+          echo "mod_version=$mod_version" >> "$GITHUB_OUTPUT"
 
-      - name: Publish to CurseForge
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.properties.outputs.mod_id }}-${{ steps.properties.outputs.mod_version }}
+          path: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.properties.outputs.mod_version }}.jar
+
+      - name: Publish mod
+        if: github.event_name == 'release' || inputs.publish
         uses: Kir-Antipov/mc-publish@v3.3.1
         with:
+          github-token: ${{ github.event_name == 'release' && secrets.GITHUB_TOKEN || '' }}
+          github-tag: ${{ github.event.release.tag_name || '' }}
+
           curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
-          files: build/libs/scannable_tweaks-${{ steps.properties.outputs.version }}.jar
-          name: Scannable Tweaks ${{ steps.properties.outputs.version }} for Minecraft 1.21.1
-          version: ${{ steps.properties.outputs.version }}
-          version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
-          changelog: ${{ github.event.release.body }}
+          modrinth-id: ${{ vars.MODRINTH_PROJECT_ID }}
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+
+          files: build/libs/${{ steps.properties.outputs.mod_id }}-${{ steps.properties.outputs.mod_version }}.jar
+          name: ${{ steps.properties.outputs.mod_name }} ${{ steps.properties.outputs.mod_version }} for Minecraft 1.21.1
+          version: ${{ steps.properties.outputs.mod_version }}
+          version-type: ${{ (github.event.release.prerelease || inputs.prerelease) && 'beta' || 'release' }}
+          changelog: ${{ github.event.release.body || '' }}
 
           loaders: neoforge
           game-versions: 1.21.1
           java: 21
           environment: client | server
+
           curseforge-dependencies: |
             scannable-reforged(required)
             jei(optional)
             roughly-enough-items(optional)
+            emi(optional)
+
+          modrinth-dependencies: |
+            jei(optional)
+            rei(optional)
             emi(optional)
 
           fail-mode: fail
