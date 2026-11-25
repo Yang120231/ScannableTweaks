@@ -54,6 +54,8 @@ jobs:
           environment: client | server
           curseforge-dependencies: |
             scannable-reforged(required)
-            jei(required)
+            jei(optional)
+            roughly-enough-items(optional)
+            emi(optional)
 
           fail-mode: fail

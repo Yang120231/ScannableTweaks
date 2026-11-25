@@ -31,6 +31,14 @@ repositories {
         forRepository { maven { name = 'Architectury'; url = 'https://maven.architectury.dev' } }
         filter { includeGroupByRegex 'dev\\.architectury.*' }
     }
+    exclusiveContent {
+        forRepository { maven { name = 'TerraformersMC'; url = 'https://maven.terraformersmc.com/' } }
+        filter { includeGroup 'dev.emi' }
+    }
+    exclusiveContent {
+        forRepository { maven { name = 'Shedaniel'; url = 'https://maven.shedaniel.me/' } }
+        filter { includeGroupByRegex 'me\\.shedaniel.*' }
+    }
 }
 
 neoForge {
@@ -62,9 +70,11 @@ dependencies {
     // resolve the signatures of Scannable classes that reference Architectury types.
     compileOnly "dev.architectury:architectury-neoforge:${architectury_version}"
 
-    // JEI: compile against the API artifacts only.
+    // JEI, REI, EMI: compile against the API artifacts only.
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    compileOnly "me.shedaniel:RoughlyEnoughItems-api-neoforge:${rei_version}"
+    compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
 }
 
 // Populate run/mods/ with the runtime mod jars. moddev 1.0.x does NOT
@@ -113,6 +123,8 @@ tasks.named('processResources', ProcessResources).configure {
             mod_issues             : mod_issues,
             scannable_version_range: scannable_version_range,
             jei_version_range      : jei_version_range,
+            rei_version_range      : rei_version_range,
+            emi_version_range      : emi_version_range,
     ]
     inputs.properties(expansions)
     filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {

@@ -42,10 +42,24 @@ versionRange = "${scannable_version_range}"
 ordering = "AFTER"
 side = "BOTH"
 
-# The drag-and-drop half only exists on the client, and JEI is a client-only mod.
+# Drag-and-drop integrations only exist on the client, and all three recipe viewers are optional.
 [[dependencies.${mod_id}]]
 modId = "jei"
-type = "required"
+type = "optional"
 versionRange = "${jei_version_range}"
+ordering = "AFTER"
+side = "CLIENT"
+
+[[dependencies.${mod_id}]]
+modId = "roughlyenoughitems"
+type = "optional"
+versionRange = "${rei_version_range}"
+ordering = "AFTER"
+side = "CLIENT"
+
+[[dependencies.${mod_id}]]
+modId = "emi"
+type = "optional"
+versionRange = "${emi_version_range}"
 ordering = "AFTER"
 side = "CLIENT"
